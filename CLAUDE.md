@@ -85,7 +85,8 @@ The project proceeds in levels. Each item becomes one or more issues in the GitH
 - **Level 1 – API and integration:** Docker setup, models and migrations, expense CRUD, Sanctum with Nuxt,
   Policies and multi-tenant scoping, separation of duties.
 - **Level 2 – Async and MongoDB:** queued receipt upload and processing, monthly export, email notifications,
-  audit log on MongoDB, policy threshold rule.
+  audit log on MongoDB, policy threshold rule, offline expense creation (the client generates the expense UUID
+  and the API accepts it idempotently when the frontend syncs).
 - **Level 3 – Security and observability:** OAuth2 Client Credentials, OIDC/JWT (optional, e.g. Keycloak),
   encryption and secrets management, structured logs.
 - **Level 4 – Quality:** test coverage, Pint and Larastan in CI, optional receipt data extraction via LLM.
