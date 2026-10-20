@@ -1,7 +1,7 @@
-# expanse-report-api
+# expense-report-api
 
 REST API for a multi-company expense management app, built with Laravel.
-The frontend lives in a separate repository: `expanse-report-web` (Nuxt).
+The frontend lives in a separate repository: `expense-report-web` (Nuxt).
 
 ## Domain
 
@@ -93,7 +93,7 @@ The project proceeds in levels. Each item becomes one or more issues in the GitH
 ## Don'ts
 
 - Do not add Composer packages without first discussing the need and the alternatives.
-- Do not modify the `expanse-report-web` repository from this session, unless explicitly asked.
+- Do not modify the `expense-report-web` repository from this session, unless explicitly asked.
 - Do not run commits, pushes or destructive commands (e.g. `migrate:fresh`) without confirmation.
 
 ## Useful commands
