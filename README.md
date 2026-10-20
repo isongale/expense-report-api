@@ -1,9 +1,9 @@
-# expanse-report-api
+# expense-report-api
 
 REST API for a multi-company expense management app: employees upload expenses with a receipt,
 managers approve them and administration reimburses them.
 
-Built with Laravel 13 (API only). The frontend lives in a separate repository, `expanse-report-web` (Nuxt).
+Built with Laravel 13 (API only). The frontend lives in a separate repository, `expense-report-web` (Nuxt).
 
 ## Requirements
 
