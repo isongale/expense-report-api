@@ -28,6 +28,14 @@ class Company extends Model
     }
 
     /**
+     * Get the categories associated with the company.
+     */
+    public function expenseCategories(): HasMany
+    {
+        return $this->hasMany(ExpenseCategory::class);
+    }
+
+    /**
      * Get the columns that should receive a unique identifier.
      *
      * @return array
