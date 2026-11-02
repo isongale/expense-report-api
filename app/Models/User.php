@@ -66,9 +66,9 @@ class User extends Authenticatable
     /**
      * Get the columns that should receive a unique identifier.
      *
-     * @return array
+     * @return list<string>
      */
-    public function uniqueIds()
+    public function uniqueIds(): array
     {
         return ['uuid'];
     }
