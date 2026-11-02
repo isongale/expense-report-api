@@ -64,6 +64,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the expenses associated with the user.
+     */
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(Expense::class);
+    }
+
+    /**
+     * Get the approvals associated with the user.
+     */
+    public function approvalsGiven(): HasMany
+    {
+        return $this->hasMany(Approval::class, 'approver_id');
+    }
+
+    /**
      * Get the columns that should receive a unique identifier.
      *
      * @return list<string>
@@ -71,13 +87,5 @@ class User extends Authenticatable
     public function uniqueIds(): array
     {
         return ['uuid'];
-    }
-
-    /**
-     * Get the expenses associated with the user.
-     */
-    public function expenses(): HasMany
-    {
-        return $this->hasMany(Expense::class);
     }
 }

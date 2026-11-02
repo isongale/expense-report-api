@@ -80,6 +80,14 @@ class Expense extends Model
     }
 
     /**
+     * Get the approvals associated with the expense.
+     */
+    public function approvals(): HasMany
+    {
+        return $this->hasMany(Approval::class);
+    }
+
+    /**
      * Get the columns that should receive a unique identifier.
      *
      * @return list<string>
