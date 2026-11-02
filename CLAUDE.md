@@ -48,9 +48,11 @@ Company, User, ExpenseCategory, Expense, Receipt, Approval.
 
 - Validation with Form Requests, output with API Resources, authorization with Policies.
 - Consistent JSON error format across the whole API; pagination on every list.
-- Business logic outside controllers (action or service classes: open decision).
+- Business logic outside controllers, in action classes: one plain PHP class per use case with a single
+  public `handle()` method, grouped by area (e.g. `app/Actions/Expenses/ApproveExpense.php`). Small service
+  classes only for logic shared by several actions. No actions package.
 - Code style with Laravel Pint; static analysis with Larastan.
-- Tests: feature tests for every endpoint and every policy. Framework (PHPUnit or Pest): open decision.
+- Tests with PHPUnit: feature tests for every endpoint and every policy, unit tests for domain rules.
 - Code, names, code comments, commit messages and technical documentation in English.
 - Small commits in Conventional Commits format (`feat:`, `fix:`, `chore:`, `test:`, `docs:`).
 
