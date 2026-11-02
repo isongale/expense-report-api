@@ -72,4 +72,12 @@ class User extends Authenticatable
     {
         return ['uuid'];
     }
+
+    /**
+     * Get the expenses associated with the user.
+     */
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(Expense::class);
+    }
 }
