@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['description', 'amount', 'expense_date'])]
 #[Hidden(['id', 'company_id', 'user_id', 'expense_category_id'])]
@@ -68,6 +69,14 @@ class Expense extends Model
     public function expenseCategory(): BelongsTo
     {
         return $this->belongsTo(ExpenseCategory::class);
+    }
+
+    /**
+     * Get the receipts associated with the expense.
+     */
+    public function receipts(): HasMany
+    {
+        return $this->hasMany(Receipt::class);
     }
 
     /**
