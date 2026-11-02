@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Enums\UserRole;
+use App\Models\Company;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -30,7 +32,41 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'company_id' => Company::factory(),
+            'role' => UserRole::Employee,
+            'iban' => fake()->iban('IT'),
         ];
+    }
+
+    public function employee(): static
+    {
+        return $this->state(['role' => UserRole::Employee]);
+    }
+
+    public function manager(): static
+    {
+        return $this->state(['role' => UserRole::Manager]);
+    }
+
+    public function admin(): static
+    {
+        return $this->state(['role' => UserRole::Admin]);
+    }
+
+    public function auditor(): static
+    {
+        return $this->state(['role' => UserRole::Auditor]);
+    }
+
+    /**
+     * Place the user in the manager's team, inside the manager's company.
+     */
+    public function managedBy(User $manager): static
+    {
+        return $this->state([
+            'company_id' => $manager->company_id,
+            'manager_id' => $manager->id,
+        ]);
     }
 
     /**
@@ -38,7 +74,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state([
             'email_verified_at' => null,
         ]);
     }

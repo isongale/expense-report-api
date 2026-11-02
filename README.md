@@ -40,6 +40,16 @@ Two things to know about `.env`:
 If your user ID is not 1000, set `HOST_UID` and `HOST_GID` in `.env` before building, so that files
 written by the containers belong to you.
 
+### Demo data
+
+```bash
+docker compose exec app php artisan migrate:fresh --seed   # drops every table first
+```
+
+It creates the company Capsule Corporation with one user per role (`admin@`, `manager@`, `employee@` and
+`auditor@capsule-corporation.test`), expenses in every status, and a second company, Franky Family
+(`employee@franky-family.test`), to try tenant isolation. Every password is `password`.
+
 ## Services
 
 | Service   | Image                   | Purpose                                   | Host access                      |
