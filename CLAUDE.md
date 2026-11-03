@@ -47,7 +47,11 @@ Company, User, ExpenseCategory, Expense, Receipt, Approval.
 ## Conventions
 
 - Validation with Form Requests, output with API Resources, authorization with Policies.
-- Consistent JSON error format across the whole API; pagination on every list.
+- Errors as RFC 9457 Problem Details (`application/problem+json`), rendered by
+  `app/Exceptions/ProblemDetailsRenderer.php` for every `api/*` request. Validation errors keep Laravel's
+  `errors` member; domain errors get their own `type` (e.g. `/problems/validation-error`). One format for
+  every API version: a later version can switch renderer by URL prefix in `bootstrap/app.php` if it ever needs to.
+- Pagination on every list.
 - Business logic outside controllers, in action classes: one plain PHP class per use case with a single
   public `handle()` method, grouped by area (e.g. `app/Actions/Expenses/ApproveExpense.php`). Small service
   classes only for logic shared by several actions. No actions package.
