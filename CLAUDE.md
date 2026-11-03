@@ -132,4 +132,7 @@ Notes:
 - Compose reads the Laravel `.env` to interpolate `compose.yaml`: avoid `$` in values, or wrap them in single quotes.
 - MySQL and MongoDB credentials are applied only when their volume is first initialised: changing them in
   `.env` afterwards has no effect until the volume is recreated (`docker compose down -v`, which deletes the data).
+- Tests run on the MySQL `testing` database (`phpunit.xml`), never on the development one.
+  `docker/mysql/init/create-testing-database.sh` creates it when the volume is first initialised; on a volume
+  created earlier, run it once: `docker compose exec mysql /docker-entrypoint-initdb.d/create-testing-database.sh`.
 - Larastan is not installed yet (Level 4).

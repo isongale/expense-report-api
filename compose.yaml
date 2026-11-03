@@ -71,6 +71,8 @@ services:
       - "127.0.0.1:3307:3306"
     volumes:
       - mysql-data:/var/lib/mysql
+      # Scripts run once, on the first initialisation: they create the "testing" database.
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
     environment:
       MYSQL_DATABASE: "${DB_DATABASE:?set DB_DATABASE in .env (see .env.example)}"
       MYSQL_USER: "${DB_USERNAME:?set DB_USERNAME in .env (see .env.example)}"
