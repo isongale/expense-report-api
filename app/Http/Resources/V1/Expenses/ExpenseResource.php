@@ -2,12 +2,15 @@
 
 namespace App\Http\Resources\V1\Expenses;
 
+use App\Http\Resources\Concerns\ExposesAbilities;
 use App\Http\Resources\V1\ExpenseCategories\ExpenseCategoryResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ExpenseResource extends JsonResource
 {
+    use ExposesAbilities;
+
     /**
      * Transform the resource into an array.
      *
@@ -21,13 +24,18 @@ class ExpenseResource extends JsonResource
             'amount' => $this->amount,
             'currency' => $this->currency,
             'expense_date' => $this->expense_date->toDateString(),
-            'status' => $this->status,
+            'status' => $this->status->value,
             'requires_second_approval' => $this->requires_second_approval,
             'category' => new ExpenseCategoryResource($this->whenLoaded('expenseCategory')),
             'submitted_at' => $this->submitted_at?->toIso8601String(),
             'reimbursed_at' => $this->reimbursed_at?->toIso8601String(),
             'created_at' => $this->created_at->toIso8601String(),
             'updated_at' => $this->updated_at->toIso8601String(),
+            // Permission (Policy) and state (draft only) together: true only if the request would succeed now.
+            'can' => [
+                'update' => $this->allows($request, 'update') && $this->status->isEditable(),
+                'delete' => $this->allows($request, 'delete') && $this->status->isEditable(),
+            ],
         ];
     }
 }
