@@ -47,6 +47,9 @@ Company, User, ExpenseCategory, Expense, Receipt, Approval.
 ## Conventions
 
 - Validation with Form Requests, output with API Resources, authorization with Policies.
+- HTTP classes that define the API contract (Form Requests, Resources, Controllers) live under a version
+  namespace, grouped by area: `app/Http/Requests/V1/Expenses/`. Cross-cutting concerns (error format,
+  tenancy, authentication) are shared by every version.
 - Errors as RFC 9457 Problem Details (`application/problem+json`), rendered by
   `app/Exceptions/ProblemDetailsRenderer.php` for every `api/*` request. Validation errors keep Laravel's
   `errors` member; domain errors get their own `type` (e.g. `/problems/validation-error`). One format for
