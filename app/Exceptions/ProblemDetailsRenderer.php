@@ -37,6 +37,14 @@ final class ProblemDetailsRenderer
             ]);
         }
 
+        if ($e instanceof ProblemException) {
+            return $this->respond($request, $e->status(), [
+                'type' => $e->type(),
+                'title' => $e->title(),
+                'detail' => $e->getMessage(),
+            ] + $e->extensions());
+        }
+
         if ($e instanceof AuthenticationException) {
             return $this->respond($request, 401, ['detail' => 'Authentication is required.']);
         }

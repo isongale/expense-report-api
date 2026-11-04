@@ -1,6 +1,7 @@
 <?php
 
 use App\Exceptions\ProblemDetailsRenderer;
+use App\Exceptions\ProblemException;
 use App\Http\Middleware\SetCurrentCompany;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -25,6 +26,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        // Domain problems are expected client errors (like 4xx HTTP exceptions): not worth an error log.
+        $exceptions->dontReport(ProblemException::class);
 
         $exceptions->render(
             fn (Throwable $e, Request $request) => (new ProblemDetailsRenderer)->render($e, $request),
