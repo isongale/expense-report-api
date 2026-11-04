@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ExpenseStatus;
+use App\Models\Concerns\BelongsToCompany;
 use Database\Factories\ExpenseFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -19,7 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Expense extends Model
 {
     /** @use HasFactory<ExpenseFactory> */
-    use HasFactory, HasUuids;
+    use BelongsToCompany, HasFactory, HasUuids;
 
     /**
      * The model's default values for attributes.

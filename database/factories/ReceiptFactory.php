@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Expense;
 use App\Models\Receipt;
+use App\Models\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -25,7 +26,9 @@ class ReceiptFactory extends Factory
         return [
             'expense_id' => Expense::factory(),
             // Follows the expense, so a receipt never belongs to another tenant.
-            'company_id' => fn (array $attributes) => Expense::findOrFail($attributes['expense_id'])->company_id,
+            // Factories run without a tenant: read the parent expense across companies, on purpose.
+            'company_id' => fn (array $attributes) => Expense::withoutGlobalScope(TenantScope::class)
+                ->findOrFail($attributes['expense_id'])->company_id,
             'disk' => 'local',
             // Before path and original_name: their extensions are derived from it.
             'mime_type' => 'application/pdf',

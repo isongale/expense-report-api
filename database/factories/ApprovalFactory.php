@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Enums\ApprovalDecision;
 use App\Models\Approval;
 use App\Models\Expense;
+use App\Models\Scopes\TenantScope;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -25,7 +26,9 @@ class ApprovalFactory extends Factory
     {
         return [
             'expense_id' => Expense::factory()->submitted(),
-            'company_id' => fn (array $attributes) => Expense::findOrFail($attributes['expense_id'])->company_id,
+            // Factories run without a tenant: read the parent expense across companies, on purpose.
+            'company_id' => fn (array $attributes) => Expense::withoutGlobalScope(TenantScope::class)
+                ->findOrFail($attributes['expense_id'])->company_id,
             // An admin of the same company: never the author, so separation of duties holds by default.
             'approver_id' => fn (array $attributes) => User::factory()->admin()
                 ->state(['company_id' => $attributes['company_id']]),

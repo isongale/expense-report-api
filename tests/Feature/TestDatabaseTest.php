@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Expense;
+use Database\Seeders\DemoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
@@ -25,5 +26,15 @@ class TestDatabaseTest extends TestCase
         $expense = Expense::factory()->create();
 
         $this->assertDatabaseHas('expenses', ['uuid' => $expense->uuid, 'company_id' => $expense->user->company_id]);
+    }
+
+    /**
+     * The seeder runs without a tenant: it must keep working with the tenant global scope.
+     */
+    public function test_the_demo_seeder_runs(): void
+    {
+        $this->seed(DemoSeeder::class);
+
+        $this->assertDatabaseCount('companies', 2);
     }
 }

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Exceptions\ProblemDetailsRenderer;
 use App\Models\Expense;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -21,7 +22,7 @@ class ProblemDetailsTest extends TestCase
         // Probe routes, registered only for these tests.
         Route::middleware('api')->prefix('api/probe')->group(function () {
             Route::post('validation', fn (Request $request) => $request->validate(['amount' => 'required|integer']));
-            Route::get('expenses/{expense}', fn (Expense $expense) => $expense);
+            Route::get('expenses/{expense}', fn (Expense $expense) => $expense)->middleware('auth:sanctum');
             Route::get('forbidden', fn () => abort(403));
             Route::get('authenticated', fn () => 'ok')->middleware('auth:sanctum');
             Route::get('crash', fn () => throw new RuntimeException('Database password is wrong'));
@@ -45,7 +46,8 @@ class ProblemDetailsTest extends TestCase
 
     public function test_a_missing_model_does_not_reveal_the_class_name(): void
     {
-        $response = $this->getJson('/api/probe/expenses/01a1aaaa-0000-7000-8000-000000000000')
+        $response = $this->actingAs(User::factory()->create(), 'sanctum')
+            ->getJson('/api/probe/expenses/01a1aaaa-0000-7000-8000-000000000000')
             ->assertNotFound()
             ->assertExactJson([
                 'type' => 'about:blank',
