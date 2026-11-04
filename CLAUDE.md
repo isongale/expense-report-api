@@ -82,6 +82,18 @@ Rules:
 - No secrets in the repository: only `.env.example` with dummy values.
 - Sensitive data encrypted at rest (for example the employee's IBAN, with the `encrypted` cast).
 - Every endpoint protected by authentication and by a Policy; no direct access by ID without a tenant check.
+- Tenant isolation:
+  - Models with a `company_id` use the `BelongsToCompany` trait (`app/Models/Concerns`). Its global scope
+    limits every Eloquent query to the current company, and its `creating` hook fills `company_id`. `User`
+    is excluded: authentication loads it before the tenant is known.
+  - The current company lives in Laravel's `Context` (`app/Tenancy/CurrentCompany.php`), so it reaches queued
+    jobs and logs. The `SetCurrentCompany` middleware sets it from the authenticated user, after
+    authentication and before route model binding.
+  - Fail closed: tenant data used without a current company throws `MissingTenantException`. Outside HTTP,
+    use `CurrentCompany::run()`; `withoutGlobalScope(TenantScope::class)` only with a comment explaining why.
+  - The scope does not cover the query builder (`DB::table()`, raw queries) or the `exists`/`unique`
+    validation rules: filter them by `company_id` explicitly.
+  - A record of another company answers 404, never 403, so its existence is not revealed.
 - Structured JSON logs with a request ID propagated to jobs and downstream calls.
 
 ## Roadmap
