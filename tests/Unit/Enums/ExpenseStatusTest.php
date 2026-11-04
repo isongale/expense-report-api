@@ -68,6 +68,7 @@ class ExpenseStatusTest extends TestCase
 
         $this->assertEqualsCanonicalizing($pairs, array_keys(self::canTransitionToProvider()));
         $this->assertEqualsCanonicalizing($statuses, array_keys(self::isFinalProvider()));
+        $this->assertEqualsCanonicalizing($statuses, array_keys(self::isEditableProvider()));
     }
 
     #[DataProvider('isFinalProvider')]
@@ -87,6 +88,26 @@ class ExpenseStatusTest extends TestCase
             'approved' => [ExpenseStatus::Approved, false],
             'rejected' => [ExpenseStatus::Rejected, true],
             'reimbursed' => [ExpenseStatus::Reimbursed, true],
+        ];
+    }
+
+    #[DataProvider('isEditableProvider')]
+    public function test_is_editable(ExpenseStatus $status, bool $expected): void
+    {
+        $this->assertSame($expected, $status->isEditable());
+    }
+
+    /**
+     * @return array<string, array{ExpenseStatus, bool}>
+     */
+    public static function isEditableProvider(): array
+    {
+        return [
+            'draft' => [ExpenseStatus::Draft, true],
+            'submitted' => [ExpenseStatus::Submitted, false],
+            'approved' => [ExpenseStatus::Approved, false],
+            'rejected' => [ExpenseStatus::Rejected, false],
+            'reimbursed' => [ExpenseStatus::Reimbursed, false],
         ];
     }
 }
