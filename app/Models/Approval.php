@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ApprovalDecision;
+use App\Models\Concerns\BelongsToCompany;
 use App\Observers\ApprovalObserver;
 use Database\Factories\ApprovalFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -18,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Approval extends Model
 {
     /** @use HasFactory<ApprovalFactory> */
-    use HasFactory;
+    use BelongsToCompany, HasFactory;
 
     const UPDATED_AT = null; // Approvals are immutable: there is no updated_at column.
 

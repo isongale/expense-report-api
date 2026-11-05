@@ -36,4 +36,12 @@ enum ExpenseStatus: string
     {
         return $this->allowedTransitions() === [];
     }
+
+    /**
+     * Whether the owner can still change or delete the expense: only before it is submitted.
+     */
+    public function isEditable(): bool
+    {
+        return $this === self::Draft;
+    }
 }

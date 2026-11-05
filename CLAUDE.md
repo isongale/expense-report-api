@@ -47,10 +47,22 @@ Company, User, ExpenseCategory, Expense, Receipt, Approval.
 ## Conventions
 
 - Validation with Form Requests, output with API Resources, authorization with Policies.
-- Consistent JSON error format across the whole API; pagination on every list.
-- Business logic outside controllers (action or service classes: open decision).
+- Controllers declare authorization as `can` middleware (`HasMiddleware::middleware()`), not with
+  `Gate::authorize()` in the method body: the middleware runs after route model binding and before the Form
+  Request, so an unauthorized user gets 403 instead of validation errors.
+- HTTP classes that define the API contract (Form Requests, Resources, Controllers) live under a version
+  namespace, grouped by area: `app/Http/Requests/V1/Expenses/`. Cross-cutting concerns (error format,
+  tenancy, authentication) are shared by every version.
+- Errors as RFC 9457 Problem Details (`application/problem+json`), rendered by
+  `app/Exceptions/ProblemDetailsRenderer.php` for every `api/*` request. Validation errors keep Laravel's
+  `errors` member; domain errors get their own `type` (e.g. `/problems/validation-error`). One format for
+  every API version: a later version can switch renderer by URL prefix in `bootstrap/app.php` if it ever needs to.
+- Pagination on every list.
+- Business logic outside controllers, in action classes: one plain PHP class per use case with a single
+  public `handle()` method, grouped by area (e.g. `app/Actions/Expenses/ApproveExpense.php`). Small service
+  classes only for logic shared by several actions. No actions package.
 - Code style with Laravel Pint; static analysis with Larastan.
-- Tests: feature tests for every endpoint and every policy. Framework (PHPUnit or Pest): open decision.
+- Tests with PHPUnit: feature tests for every endpoint and every policy, unit tests for domain rules.
 - Code, names, code comments, commit messages and technical documentation in English.
 - Small commits in Conventional Commits format (`feat:`, `fix:`, `chore:`, `test:`, `docs:`).
 
@@ -76,6 +88,18 @@ Rules:
 - No secrets in the repository: only `.env.example` with dummy values.
 - Sensitive data encrypted at rest (for example the employee's IBAN, with the `encrypted` cast).
 - Every endpoint protected by authentication and by a Policy; no direct access by ID without a tenant check.
+- Tenant isolation:
+  - Models with a `company_id` use the `BelongsToCompany` trait (`app/Models/Concerns`). Its global scope
+    limits every Eloquent query to the current company, and its `creating` hook fills `company_id`. `User`
+    is excluded: authentication loads it before the tenant is known.
+  - The current company lives in Laravel's `Context` (`app/Tenancy/CurrentCompany.php`), so it reaches queued
+    jobs and logs. The `SetCurrentCompany` middleware sets it from the authenticated user, after
+    authentication and before route model binding.
+  - Fail closed: tenant data used without a current company throws `MissingTenantException`. Outside HTTP,
+    use `CurrentCompany::run()`; `withoutGlobalScope(TenantScope::class)` only with a comment explaining why.
+  - The scope does not cover the query builder (`DB::table()`, raw queries) or the `exists`/`unique`
+    validation rules: filter them by `company_id` explicitly.
+  - A record of another company answers 404, never 403, so its existence is not revealed.
 - Structured JSON logs with a request ID propagated to jobs and downstream calls.
 
 ## Roadmap
@@ -130,4 +154,7 @@ Notes:
 - Compose reads the Laravel `.env` to interpolate `compose.yaml`: avoid `$` in values, or wrap them in single quotes.
 - MySQL and MongoDB credentials are applied only when their volume is first initialised: changing them in
   `.env` afterwards has no effect until the volume is recreated (`docker compose down -v`, which deletes the data).
+- Tests run on the MySQL `testing` database (`phpunit.xml`), never on the development one.
+  `docker/mysql/init/create-testing-database.sh` creates it when the volume is first initialised; on a volume
+  created earlier, run it once: `docker compose exec mysql /docker-entrypoint-initdb.d/create-testing-database.sh`.
 - Larastan is not installed yet (Level 4).
