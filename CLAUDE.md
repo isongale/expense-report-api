@@ -47,6 +47,9 @@ Company, User, ExpenseCategory, Expense, Receipt, Approval.
 ## Conventions
 
 - Validation with Form Requests, output with API Resources, authorization with Policies.
+- Controllers declare authorization as `can` middleware (`HasMiddleware::middleware()`), not with
+  `Gate::authorize()` in the method body: the middleware runs after route model binding and before the Form
+  Request, so an unauthorized user gets 403 instead of validation errors.
 - HTTP classes that define the API contract (Form Requests, Resources, Controllers) live under a version
   namespace, grouped by area: `app/Http/Requests/V1/Expenses/`. Cross-cutting concerns (error format,
   tenancy, authentication) are shared by every version.
