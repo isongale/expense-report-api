@@ -17,6 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Sanctum SPA: requests from the stateful domains (config/sanctum.php) get cookies, session and
+        // CSRF protection, and authenticate with the session instead of a token.
+        $middleware->statefulApi();
+
         // The tenant comes from the authenticated user. The priority list runs this middleware after
         // authentication (already earlier in the list) and before route model binding.
         $middleware->api(append: [SetCurrentCompany::class]);

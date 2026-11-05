@@ -21,6 +21,11 @@ final class ProblemDetailsRenderer
 {
     public const VALIDATION_TYPE = '/problems/validation-error';
 
+    /**
+     * Laravel's own statuses, unknown to Symfony's status texts.
+     */
+    private const STATUS_TITLES = [419 => 'Page Expired'];
+
     public function render(Throwable $e, Request $request): ?JsonResponse
     {
         // Responses built on purpose, and non-API requests, keep Laravel's rendering.
@@ -65,7 +70,7 @@ final class ProblemDetailsRenderer
     {
         $problem = [
             'type' => $members['type'] ?? 'about:blank',
-            'title' => $members['title'] ?? (Response::$statusTexts[$status] ?? 'Error'),
+            'title' => $members['title'] ?? (self::STATUS_TITLES[$status] ?? Response::$statusTexts[$status] ?? 'Error'),
             'status' => $status,
             'detail' => $members['detail'] ?? null,
             'instance' => '/'.$request->path(),
@@ -83,6 +88,11 @@ final class ProblemDetailsRenderer
         // The model-not-found message names the PHP class: never send it to clients.
         if ($e->getStatusCode() === 404) {
             return 'The requested resource was not found.';
+        }
+
+        // CSRF token missing or expired (Sanctum SPA): tell the client how to recover.
+        if ($e->getStatusCode() === 419) {
+            return 'The CSRF token is missing or expired: request /sanctum/csrf-cookie again.';
         }
 
         return $e->getMessage() !== '' ? $e->getMessage() : null;

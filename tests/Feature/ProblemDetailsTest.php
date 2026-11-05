@@ -7,6 +7,7 @@ use App\Models\Expense;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
+use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Facades\Route;
 use RuntimeException;
 use Tests\TestCase;
@@ -26,6 +27,8 @@ class ProblemDetailsTest extends TestCase
             Route::get('forbidden', fn () => abort(403));
             Route::get('authenticated', fn () => 'ok')->middleware('auth:sanctum');
             Route::get('crash', fn () => throw new RuntimeException('Database password is wrong'));
+            // CSRF is skipped while running tests: throw the exception the middleware would throw.
+            Route::post('csrf', fn () => throw new TokenMismatchException('CSRF token mismatch.'));
         });
     }
 
@@ -89,6 +92,14 @@ class ProblemDetailsTest extends TestCase
         $this->deleteJson('/api/probe/forbidden')
             ->assertStatus(405)
             ->assertHeader('Allow');
+    }
+
+    public function test_an_expired_csrf_token_tells_how_to_recover(): void
+    {
+        $this->postJson('/api/probe/csrf')
+            ->assertStatus(419)
+            ->assertJsonPath('title', 'Page Expired')
+            ->assertJsonPath('detail', 'The CSRF token is missing or expired: request /sanctum/csrf-cookie again.');
     }
 
     public function test_server_errors_hide_the_exception_without_debug(): void
