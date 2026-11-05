@@ -46,6 +46,16 @@ class ExpenseSecurityTest extends TestCase
         return ['show' => ['get'], 'update' => ['patch'], 'delete' => ['delete']];
     }
 
+    public function test_updates_are_patch_only(): void
+    {
+        $expense = Expense::factory()->create();
+
+        $this->actingAs($expense->user, 'sanctum')
+            ->putJson("/api/v1/expenses/{$expense->uuid}", ['description' => 'Replaced'])
+            ->assertStatus(405)
+            ->assertHeader('Allow', 'GET, HEAD, PATCH, DELETE');
+    }
+
     public function test_the_list_only_contains_the_users_own_expenses(): void
     {
         $mine = Expense::factory()->create();
